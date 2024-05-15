@@ -10,7 +10,7 @@ const swaggerUi = require('swagger-ui-express')
 const users = require('./Routes/users')
 
 // connection to mysqldatabase
-// sqlconnect();
+sqlconnect();
 
 // middlewares
 app.use(express.json());
@@ -40,8 +40,10 @@ app.use(cors(corsOption));
 app.get('/', (req, res) => {
     res.json({ Message: 'Stock Plus Backend Server.' });
 });
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 const swaggerSpec = swaggerJSDoc(options)
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { customCssUrl: CSS_URL }))
 app.use("/api", users); // users
 
 // Connetion to the server
