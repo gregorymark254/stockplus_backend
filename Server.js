@@ -3,16 +3,70 @@ const app = express();
 const cors = require('cors');
 const corsOption = require('./Db/corsOptions');
 require('dotenv').config();
+const bodyParser = require('body-parser')
+const morgan = require('morgan')
 const { sqlconnect } = require('./Db/dbConfig');
-const options = require('./Swagger')
 const swaggerJsDoc = require('swagger-jsdoc')
 const swaggerUI = require('swagger-ui-express')
 const users = require('./Routes/users')
+
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Stock Plus Api',
+            version: '1.0.0',
+            description: 'Stock Plus Backend server'
+        },
+        servers: [
+            {
+                url: 'https://stockplus-backend.vercel.app'
+            }
+        ],
+        components: {
+            schemas: {
+                EmailAndPassword: {
+                    type: 'object',
+                    properties: {
+                        email: {
+                            type: 'string',
+                            format: 'email'
+                        },
+                        password: {
+                            type: 'string',
+                            format: 'password'
+                        }
+                    },
+                    required: ['email', 'password']
+                }
+            },
+            securitySchemes: {
+                OAuth2PasswordBearer: {
+                    type: 'oauth2',
+                    flows: {
+                        password: {
+                            tokenUrl: '/api/v1/login',
+                            scopes: {}
+                        }
+                    }
+                }
+            }
+        },
+        security: [
+            {
+                OAuth2PasswordBearer: []
+            }
+        ]
+    },
+    apis:  ["src/**/*.js"]
+};
 
 // connection to mysqldatabase
 // sqlconnect();
 
 // middlewares
+app.use(bodyParser.json());
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOption));
