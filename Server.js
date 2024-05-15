@@ -4,7 +4,9 @@ const cors = require('cors');
 const corsOption = require('./Db/corsOptions');
 require('dotenv').config();
 const { sqlconnect } = require('./Db/dbConfig');
-const swagger = require('./Swagger')
+const options = require('./Swagger')
+const swaggerJSDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 const users = require('./Routes/users')
 
 // connection to mysqldatabase
@@ -16,10 +18,30 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOption));
 
 // routes
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Get homepage message
+ *     description: Retrieve the message displayed on the homepage of the Stock Plus Backend Server.
+ *     responses:
+ *       200:
+ *         description: A JSON object containing the homepage message.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Message:
+ *                   type: string
+ *                   description: The message displayed on the homepage.
+ *                   example: Stock Plus Backend Server.
+ */
 app.get('/', (req, res) => {
     res.json({ Message: 'Stock Plus Backend Server.' });
 });
-app.use("/api", swagger); //api documentation
+const swaggerSpec = swaggerJSDoc(options)
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 app.use("/api/v1", users); // users
 
 // Connetion to the server

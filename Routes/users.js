@@ -5,6 +5,39 @@ const jwt = require('jsonwebtoken');
 const authUser = require('../Middleware/authUser');
 
 // register user
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Register a new user with provided details.
+ *     tags:
+ *       - auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phoneNumber:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Registration successful
+ *       400:
+ *         description: Bad request or invalid data
+ *       409:
+ *         description: Email already exists
+ */
 router.post('/register', async (req, res) => {
   const { firstName, lastName, email, phoneNumber, password } = req.body;
 
@@ -46,6 +79,36 @@ router.post('/register', async (req, res) => {
 });
 
 // login user
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login user
+ *     description: Login user with provided email and password.
+ *     tags:
+ *       - auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       400:
+ *         description: Bad request or invalid data
+ *       401:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Internal server error
+ */
+
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -80,6 +143,20 @@ router.post('/login', (req, res) => {
 });
 
 // get all users
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get all users
+ *     description: Retrieve all users from the database.
+ *     tags:
+ *      - auth
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *       500:
+ *         description: Internal server error
+ */
 router.get('/users', authUser, (req, res) => {
   const sql = 'SELECT * FROM users';
   connection.query(sql, [true], (error, results, fields) => {
@@ -92,6 +169,29 @@ router.get('/users', authUser, (req, res) => {
 });
 
 // get user by id
+/**
+ * @swagger
+ * /users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     description: Retrieve a user by their ID.
+ *     tags:
+ *      - auth
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the user to retrieve.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User found
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 router.get('/users/:id', authUser, (req, res) => {
   try {
     const id = req.params.id;
@@ -111,6 +211,42 @@ router.get('/users/:id', authUser, (req, res) => {
 });
 
 // update a user by id
+/**
+ * @swagger
+ * /updateuser/{id}:
+ *   put:
+ *     summary: Update user by ID
+ *     description: Update user details by their ID.
+ *     tags:
+ *       - auth
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the user to update.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       400:
+ *         description: Bad request or invalid data
+ *       500:
+ *         description: Internal server error
+ */
 router.put('/updateuser/:id', authUser, (req, res) => {
   try {
     const id = req.params.id;
@@ -130,6 +266,29 @@ router.put('/updateuser/:id', authUser, (req, res) => {
 });
 
 // delete a user by id
+/**
+ * @swagger
+ * /deleteuser/{id}:
+ *   delete:
+ *     summary: Delete user by ID
+ *     description: Delete a user by their ID.
+ *     tags:
+ *       - auth
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the user to delete.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       400:
+ *         description: Bad request or invalid data
+ *       500:
+ *         description: Internal server error
+ */
 router.delete('/deleteuser/:id', authUser, (req, res) => {
   try {
     const id = req.params.id;
