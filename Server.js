@@ -5,7 +5,7 @@ const corsOption = require('./Db/corsOptions');
 require('dotenv').config();
 const { sqlconnect } = require('./Db/dbConfig');
 const swaggerJsDoc = require('swagger-jsdoc')
-const swaggerUi = require('swagger-ui-express')
+const swaggerUI = require('swagger-ui-express')
 const users = require('./Routes/users')
 const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 // const options = require('./Swagger')
@@ -71,8 +71,8 @@ const options = {
   
   app.use(
     "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(specs, { customCssUrl: CSS_URL })
+    swaggerUI.serve,
+    swaggerUI.setup(specs, { customCssUrl: CSS_URL })
   );
 
 // Connetion to the server
