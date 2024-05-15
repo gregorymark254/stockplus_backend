@@ -7,7 +7,7 @@ const authUser = require('../Middleware/authUser');
 // register user
 /**
  * @swagger
- * /register:
+ * /api/register:
  *   post:
  *     summary: Register a new user
  *     description: Register a new user with provided details.
@@ -81,7 +81,7 @@ router.post('/register', async (req, res) => {
 // login user
 /**
  * @swagger
- * /login:
+ * /api/login:
  *   post:
  *     summary: Login user
  *     description: Login user with provided email and password.
@@ -145,7 +145,7 @@ router.post('/login', (req, res) => {
 // get all users
 /**
  * @swagger
- * /users:
+ * /api/users:
  *   get:
  *     summary: Get all users
  *     description: Retrieve all users from the database.
@@ -171,7 +171,7 @@ router.get('/users', authUser, (req, res) => {
 // get user by id
 /**
  * @swagger
- * /users/{id}:
+ * /api/users/{id}:
  *   get:
  *     summary: Get user by ID
  *     description: Retrieve a user by their ID.
@@ -213,7 +213,7 @@ router.get('/users/:id', authUser, (req, res) => {
 // update a user by id
 /**
  * @swagger
- * /updateuser/{id}:
+ * /api/updateuser/{id}:
  *   put:
  *     summary: Update user by ID
  *     description: Update user details by their ID.
@@ -268,7 +268,7 @@ router.put('/updateuser/:id', authUser, (req, res) => {
 // delete a user by id
 /**
  * @swagger
- * /deleteuser/{id}:
+ * /api/deleteuser/{id}:
  *   delete:
  *     summary: Delete user by ID
  *     description: Delete a user by their ID.
