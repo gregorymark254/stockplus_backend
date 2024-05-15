@@ -10,7 +10,7 @@ const swaggerUi = require('swagger-ui-express')
 const users = require('./Routes/users')
 
 // connection to mysqldatabase
-sqlconnect();
+// sqlconnect();
 
 // middlewares
 app.use(express.json());
