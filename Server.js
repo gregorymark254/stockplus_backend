@@ -37,11 +37,11 @@ app.use(cors(corsOption));
  *                   description: The message displayed on the homepage.
  *                   example: Stock Plus Backend Server.
  */
-// app.get('/', (req, res) => {
-//     res.json({ Message: 'Stock Plus Backend Server.' });
-// });
+app.get('/', (req, res) => {
+    res.json({ Message: 'Stock Plus Backend Server.' });
+});
 const swaggerSpec = swaggerJSDoc(options)
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 app.use("/api", users); // users
 
 // Connetion to the server
