@@ -16,11 +16,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOption));
 
 // routes
-app.get('/app', (req, res) => {
+app.get('/', (req, res) => {
     res.json({ Message: 'Stock Plus Backend Server.' });
 });
-app.use("/app/v1", swagger); //api documentation
-app.use("/app/v1", users); // users route
+app.use("/api", swagger); //api documentation
+app.use("/api/v1", users); // users route
 
 // Connetion to the server
 const PORT = process.env.PORT2;
