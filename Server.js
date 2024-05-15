@@ -1,103 +1,138 @@
-const express = require('express');
+import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import dotenv from "dotenv";
+import swaggerUI from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
+
+import bodyParser from "body-parser";
+
+
+// CDN CSS
+
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+
 const app = express();
-const cors = require('cors');
-const corsOption = require('./Db/corsOptions');
-require('dotenv').config();
-const bodyParser = require('body-parser')
-const morgan = require('morgan')
-const { sqlconnect } = require('./Db/dbConfig');
-const swaggerJsDoc = require('swagger-jsdoc')
-const swaggerUI = require('swagger-ui-express')
-const users = require('./Routes/users')
+
+app.use(bodyParser.json()); // to use body object in requests
+const PORT = process.env.PORT || 2001;
+dotenv.config();
+
+app.use(morgan("dev"));
+app.use(cors());
 
 const options = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Stock Plus Api',
-            version: '1.0.0',
-            description: 'Stock Plus Backend server'
-        },
-        servers: [
-            {
-                url: 'https://stockplus-backend.vercel.app'
-            }
-        ],
-        components: {
-            schemas: {
-                EmailAndPassword: {
-                    type: 'object',
-                    properties: {
-                        email: {
-                            type: 'string',
-                            format: 'email'
-                        },
-                        password: {
-                            type: 'string',
-                            format: 'password'
-                        }
-                    },
-                    required: ['email', 'password']
-                }
-            },
-            securitySchemes: {
-                OAuth2PasswordBearer: {
-                    type: 'oauth2',
-                    flows: {
-                        password: {
-                            tokenUrl: '/api/v1/login',
-                            scopes: {}
-                        }
-                    }
-                }
-            }
-        },
-        security: [
-            {
-                OAuth2PasswordBearer: []
-            }
-        ]
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Library API",
+      version: "1.0.0",
+      description: "A simple Express Library API",
+      termsOfService: "http://example.com/terms/",
+      contact: {
+        name: "API Support",
+        url: "http://www.exmaple.com/support",
+        email: "support@example.com",
+      },
     },
-    apis:  ["src/**/*.js"]
+    servers: [
+      {
+        url: "https://nodejs-swagger-api.vercel.app/",
+        description: "My API Documentation",
+      },
+    ],
+  },
+  // This is to call all the file
+  apis: ["src/**/*.js"],
 };
 
-// connection to mysqldatabase
-// sqlconnect();
+const specs = swaggerJsDoc(options);
+// app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
-// middlewares
-app.use(bodyParser.json());
-app.use(morgan("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors(corsOption));
+app.use(
+  "/api-docs",
+  swaggerUI.serve,
+  swaggerUI.setup(specs, { customCssUrl: CSS_URL })
+);
 
-// routes
-/**
- * @swagger
- * /:
- *   get:
- *     summary: Get homepage message
- *     description: Retrieve the message displayed on the homepage of the Stock Plus Backend Server.
- *     responses:
- *       200:
- *         description: A JSON object containing the homepage message.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 Message:
- *                   type: string
- *                   description: The message displayed on the homepage.
- *                   example: Stock Plus Backend Server.
- */
-app.get('/', (req, res) => {
-    res.json({ Message: 'Stock Plus Backend Server.' });
-});
-const swaggerSpec = swaggerJsDoc(options)
-app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec))
-app.use("/api", users); // users
+// Here we are calling the basic html
+// Use the router from the hello.js file
+// app.use("/", helloRouter);
+// // Use the router from the post.js file
+// app.use("/posts", postRouter);
 
-// Connetion to the server
-const PORT = process.env.PORT2;
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server runs on port ${PORT}`));
+
+// import express from "express";
+// import cors from "cors";
+// import morgan from "morgan";
+// import dotenv from "dotenv";
+// import bodyParser from "body-parser";
+// import swaggerUI from "swagger-ui-express";
+// import swaggerJsDoc from "swagger-jsdoc";
+
+// // Import the router from the hello.js file
+// import postRouter from "./src/Routes/posts.js";
+// import helloRouter from "./src/hello.js";
+
+// //? CDN CSS
+// const CSS_URL =
+//   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+
+// const app = express();
+
+// app.use(bodyParser.json()); // to use body object in requests
+// const PORT = process.env.PORT || 2000;
+// dotenv.config();
+
+// app.use(morgan("dev"));
+// app.use(cors());
+
+// const options = {
+//   definition: {
+//     openapi: "3.0.0",
+//     info: {
+//       title: "Library API",
+//       version: "1.0.0",
+//       description: "A simple Express Library API",
+//       termsOfService: "http://example.com/terms/",
+//       contact: {
+//         name: "API Support",
+//         url: "http://www.exmaple.com/support",
+//         email: "support@example.com",
+//       },
+//     },
+//     servers: [
+//       {
+//         url: "http://localhost:2000",
+//         description: "My API Documentation",
+//       },
+//     ],
+//   },
+//   // This is to call all the file
+//   apis: ["src/**/*.js"],
+// };
+
+// const specs = swaggerJsDoc(options);
+// // app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+
+// // custome css added!
+// app.use("/public", express.static("public/swagger.css"));
+// app.use(
+//   "/api-docs",
+//   swaggerUI.serve,
+//   swaggerUI.setup(specs, { customCssUrl: "/public/swagger.css" && CSS_URL })
+// );
+
+// // Here we are calling the basic html
+// // Use the router from the hello.js file
+
+// //* All the routes goes here!
+// app.use("/", helloRouter);
+
+// // Use the router from the post.js file
+// app.use("/posts", postRouter);
+
+// //? This is for running the app
+// app.listen(PORT, () => console.log(`Server runs on port ${PORT}`));
