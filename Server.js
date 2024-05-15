@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
     res.json({ Message: 'Stock Plus Backend Server.' });
 });
 app.use("/api", swagger); //api documentation
-app.use("/api/v1", users); // users route
+app.use("/api/v1", users); // users
 
 // Connetion to the server
 const PORT = process.env.PORT2;
