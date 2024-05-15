@@ -18,7 +18,7 @@ const CSS_URL =
 
 
 app.use(bodyParser.json()); // to use body object in requests
-const PORT = process.env.PORT;
+const PORT = process.env.PORT2;
 
 app.use(morgan("dev"));
 app.use(cors());
