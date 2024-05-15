@@ -7,7 +7,7 @@ const { sqlconnect } = require('./Db/dbConfig');
 const swaggerJSDoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express')
 const users = require('./Routes/users')
-const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.10/swagger-ui.min.css";
 const options = require('./Swagger')
 
 // connection to mysqldatabase
