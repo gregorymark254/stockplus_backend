@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   stock_backend:
-    image: registry.gitlab.com/gregorymark25/rbt_content_server
+    image: registry.gitlab.com/gregorymark25/stock_plus
     restart: unless-stopped
     volumes:
       - ./logs:/app/logs
@@ -18,7 +18,7 @@ services:
     ports:
       - "8000:80"
     depends_on:
-      - rbt_backend
+      - stock_backend
     networks:
       - node-network
 
