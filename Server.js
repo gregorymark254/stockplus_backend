@@ -1,11 +1,14 @@
-import express from "express";
-import cors from "cors";
-import morgan from "morgan";
-import dotenv from "dotenv";
-import swaggerUI from "swagger-ui-express";
-import swaggerJsDoc from "swagger-jsdoc";
-
-import bodyParser from "body-parser";
+const express = require('express');
+const app = express();
+const cors = require('cors');
+const corsOption = require('./Db/corsOptions');
+require('dotenv').config();
+const bodyParser = require('body-parser')
+const morgan = require('morgan')
+const { sqlconnect } = require('./Db/dbConfig');
+const swaggerJsDoc = require('swagger-jsdoc')
+const swaggerUI = require('swagger-ui-express')
+const users = require('./Routes/users')
 
 
 // CDN CSS
@@ -13,11 +16,9 @@ import bodyParser from "body-parser";
 const CSS_URL =
   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 
-const app = express();
 
 app.use(bodyParser.json()); // to use body object in requests
 const PORT = process.env.PORT || 2001;
-dotenv.config();
 
 app.use(morgan("dev"));
 app.use(cors());
