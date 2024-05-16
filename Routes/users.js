@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
   const checkDuplicateQuery = 'SELECT * FROM users WHERE email = ?';
   connection.query(checkDuplicateQuery, [email], async (duplicateErr, duplicateResult) => {
     if (duplicateErr) {
-      console.error('Error checking for duplicate email:', duplicateErr);
+      console.error(duplicateErr);
       res.status(500).send('Duplicate error');
       return;
     }
@@ -57,24 +57,19 @@ router.post('/register', async (req, res) => {
 
     // Generate a salt and hash the password
     const saltRounds = 10;
-    try {
-      const salt = await bcrypt.genSalt(saltRounds);
-      const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-      // Store firstName, lastName, email, phoneNumber, role and hashed password in the database
-      const insertUserQuery = 'INSERT INTO users (firstName, lastName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)';
-      connection.query(insertUserQuery, [firstName, lastName, email, phoneNumber, hashedPassword], (insertErr, insertResult) => {
-        if (insertErr) {
-          console.error('Error executing MySQL insert query:', insertErr);
-          res.status(500).send('SQL Error');
-        } else {
-          res.status(200).json({ message: 'Registration successful' });
-        }
-      });
-    } catch (error) {
-      console.error('Error:', error);
-      res.status(500).send('Registration failed');
-    }
+    // Store firstName, lastName, email, phoneNumber, role and hashed password in the database
+    const insertUserQuery = 'INSERT INTO users (firstName, lastName, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?)';
+    connection.query(insertUserQuery, [firstName, lastName, email, phoneNumber, hashedPassword], (insertErr, insertResult) => {
+      if (insertErr) {
+        console.error(insertErr);
+        res.status(500).send('Failed to register');
+      } else {
+        res.status(200).json({ message: 'Registration successful' });
+      }
+    });
   });
 });
 
@@ -158,13 +153,45 @@ router.post('/login', (req, res) => {
  *         description: Internal server error
  */
 router.get('/users', authUser, (req, res) => {
-  const sql = 'SELECT * FROM users';
-  connection.query(sql, [true], (error, results, fields) => {
-    if (error) {
-      console.error(error.message);
+  const { limit, offset, search } = req.query;
+  const limitValue = parseInt(limit) || 100;
+  const offsetValue = parseInt(offset) || 0;
+
+  let sql;
+  let searchValue;
+  const params = [];
+
+  if (search) {
+    sql = `SELECT * FROM users WHERE email LIKE ? ORDER BY createdAt DESC LIMIT ? OFFSET ?`;
+    searchValue = `%${search}%`;
+    params.push(searchValue);
+  } else {
+    sql = 'SELECT * FROM users ORDER BY createdAt DESC LIMIT ? OFFSET ?';
+  }
+
+  params.push(limitValue);
+  params.push(offsetValue);
+  
+  // Execute count query to get total rows
+  const countSql = 'SELECT COUNT(*) AS total FROM users';
+  connection.query(countSql, [searchValue], (countErr, countResults) => {
+    if (countErr) {
+      console.error(countErr.message);
       return res.status(500).json({ error: 'Internal server error' });
     }
-    res.json(results);
+
+    const totalRows = countResults[0].total;
+
+    // Execute main query to fetch data with search condition
+    connection.query(sql, params, (error, results) => {
+      if (error) {
+        console.error(error.message);
+        return res.status(500).json({ error: 'Internal server error' });
+      }
+      
+      // Returning results along with total rows for pagination
+      res.json({ total: totalRows, results: results });
+    });
   });
 });
 
@@ -193,21 +220,16 @@ router.get('/users', authUser, (req, res) => {
  *         description: Internal server error
  */
 router.get('/users/:id', authUser, (req, res) => {
-  try {
-    const id = req.params.id;
-    const sql = 'SELECT * FROM users WHERE id = ?';
+  const id = req.params.id;
+  const sql = 'SELECT * FROM users WHERE userId = ?';
 
-    connection.query(sql, [id], (error, results, fields) => {
-      if (error) {
-        console.error(error.message);
-        return res.status(500).json({ error: 'Mysql fetchby id Error' });
-      }
-      res.json(results[0]);
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
+  connection.query(sql, [id], (error, results, fields) => {
+    if (error) {
+      console.error(error.message);
+      return res.status(500).json({ error: 'Mysql fetchby id Error' });
+    }
+    res.json(results[0]);
+  });
 });
 
 // update a user by id
@@ -250,10 +272,10 @@ router.get('/users/:id', authUser, (req, res) => {
 router.put('/updateuser/:id', authUser, (req, res) => {
   try {
     const id = req.params.id;
-    const { firstName, email, role } = req.body;
+    const { firstName, lastName, phoneNumber, role } = req.body;
 
-    const sql = 'UPDATE users SET firstName = ?, email = ?, role = ? WHERE id = ?';
-    const data = [firstName, email, role, id];
+    const sql = 'UPDATE users SET firstName = ?, lastName = ?, phoneNumber = ?, role = ? WHERE userId = ?';
+    const data = [firstName, lastName, phoneNumber, role, id];
 
     connection.query(sql, data, (error, results, fields) => {
       if (error) return console.error(error.message);
@@ -290,20 +312,17 @@ router.put('/updateuser/:id', authUser, (req, res) => {
  *         description: Internal server error
  */
 router.delete('/deleteuser/:id', authUser, (req, res) => {
-  try {
-    const id = req.params.id;
+  const id = req.params.id;
+  const sql = 'DELETE FROM users WHERE userId = ?';
+  const data = [id];
 
-    const sql = 'DELETE FROM users WHERE id = ?';
-    const data = [id];
-
-    connection.query(sql, data, (error, results, fields) => {
-      if (error) return console.error(error.message);
-      res.status(200).json({ message: 'User Deleted' });
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({ message: error.message });
-  }
+  connection.query(sql, data, (error, results) => {
+    if (error) {
+      console.error(error.message);
+      return res.status(500).json({ error: 'Failed to delete user' });
+    }
+    res.send('File deleted successfully');
+  });
 });
 
 module.exports = router;
