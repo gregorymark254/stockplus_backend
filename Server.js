@@ -8,6 +8,9 @@ const errorHandler = require('./Middleware/errorHandler');
 const { sqlconnect } = require('./Db/dbConfig');
 const swagger = require('./Swagger')
 const users = require('./Routes/users')
+const product = require('./Routes/product')
+const orders = require('./Routes/orders')
+const payment = require('./Routes/payments')
 
 // connection to mysqldatabase
 sqlconnect();
@@ -24,6 +27,9 @@ app.get('/', (req, res) => {
 });
 app.use("/api", swagger) // swagger docs
 app.use("/api", users); // users
+app.use("/api", product); // products
+app.use("/api", orders); // orders
+app.use("/api", payment); // payments
 
 // Error handler
 app.use(errorHandler);

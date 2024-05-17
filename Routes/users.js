@@ -204,25 +204,44 @@ router.get('/users', authUser, (req, res) => {
 // get user by id
 /**
  * @swagger
- * /api/users/{id}:
+ * /api/users:
  *   get:
- *     summary: Get user by ID
- *     description: Retrieve a user by their ID.
+ *     summary: Get all users
+ *     description: Retrieve all users from the database with optional filtering and pagination.
  *     tags:
- *      - users
+ *       - users
  *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID of the user to retrieve.
+ *       - in: query
+ *         name: limit
+ *         description: Number of items to return per page.
  *         schema:
  *           type: integer
+ *           default: 100
+ *       - in: query
+ *         name: offset
+ *         description: Number of items to skip.
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *       - in: query
+ *         name: search
+ *         description: Search string to filter users by email.
+ *         schema:
+ *           type: string
  *     responses:
- *       200:
- *         description: User found
- *       404:
- *         description: User not found
- *       500:
+ *       '200':
+ *         description: A list of users with total count and pagination info.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of users matching the search criteria.
+ *                 results:
+ *                   type: array
+ *       '500':
  *         description: Internal server error
  */
 router.get('/users/:id', authUser, (req, res) => {
