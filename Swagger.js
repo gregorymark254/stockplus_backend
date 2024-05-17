@@ -36,7 +36,7 @@ const options = {
                 bearerAuth: {
                     type: 'http',
                     scheme: 'Bearer',
-                    description: 'Copy "Bearer: {token}" in the Authorization header use the docs.'
+                    description: 'Copy "Bearer: {token}" in the Authorization header to use the docs.'
                 }
             }
         },

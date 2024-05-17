@@ -29,5 +29,5 @@ app.use("/api", users); // users
 app.use(errorHandler);
 
 // Connetion to the server
-const PORT = process.env.PORT2;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

@@ -171,9 +171,15 @@ router.get('/users', authUser, (req, res) => {
 
   params.push(limitValue);
   params.push(offsetValue);
+
+  let countSql;
+  if (search) {
+    countSql = 'SELECT COUNT(*) AS total FROM users WHERE email LIKE ?';
+  } else {
+    countSql = 'SELECT COUNT(*) AS total FROM users';
+  }
   
   // Execute count query to get total rows
-  const countSql = 'SELECT COUNT(*) AS total FROM users';
   connection.query(countSql, [searchValue], (countErr, countResults) => {
     if (countErr) {
       console.error(countErr.message);
