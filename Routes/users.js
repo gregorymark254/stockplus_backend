@@ -145,7 +145,7 @@ router.post('/login', (req, res) => {
  *     summary: Get all users
  *     description: Retrieve all users from the database.
  *     tags:
- *      - auth
+ *      - users
  *     responses:
  *       200:
  *         description: A list of users
@@ -203,7 +203,7 @@ router.get('/users', authUser, (req, res) => {
  *     summary: Get user by ID
  *     description: Retrieve a user by their ID.
  *     tags:
- *      - auth
+ *      - users
  *     parameters:
  *       - in: path
  *         name: id
@@ -240,7 +240,7 @@ router.get('/users/:id', authUser, (req, res) => {
  *     summary: Update user by ID
  *     description: Update user details by their ID.
  *     tags:
- *       - auth
+ *       - users
  *     parameters:
  *       - in: path
  *         name: id
@@ -295,7 +295,7 @@ router.put('/updateuser/:id', authUser, (req, res) => {
  *     summary: Delete user by ID
  *     description: Delete a user by their ID.
  *     tags:
- *       - auth
+ *       - users
  *     parameters:
  *       - in: path
  *         name: id
