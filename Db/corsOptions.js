@@ -2,7 +2,7 @@
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://localhost:4500',
+  'http://localhost:8080',
   'https://stockplus.vercel.app'
 ];
 
