@@ -350,3 +350,16 @@
 20240517	12:23:43	716be2e9-da5c-47bc-a710-331012ea4d71	GET	http://localhost:3001	/api/users?offset=0&limit=20&search=
 20240517	12:23:48	844645d2-b263-4ba4-a28a-5d3772529020	GET	http://localhost:3001	/api/users?offset=20&limit=20&search=
 20240517	12:23:51	2e6c5dcb-8bbe-46ea-bb4b-ed3b43d791d2	GET	http://localhost:3001	/api/users?offset=0&limit=20&search=Lupe35@hotmail.com
+20240517	21:32:24	edf59cfc-c72f-4508-a2c1-c0bf61c60152	GET	undefined	/api/docs
+20240517	21:32:24	f05fcbca-e6ef-4378-aa07-0dfb108907b8	GET	undefined	/api/docs/
+20240517	21:32:24	1852b603-cd94-4500-a144-225bba6778b9	GET	undefined	/api/docs/swagger-ui.css
+20240517	21:32:24	59a322d2-64f4-425f-b4aa-98d51a74c889	GET	undefined	/api/docs/swagger-ui-bundle.js
+20240517	21:32:24	0dd91302-55f6-4fd8-8c1c-68151cefac2d	GET	undefined	/api/docs/swagger-ui-standalone-preset.js
+20240517	21:32:24	8557dcf8-ca39-4e1a-b52c-d57b44e8ec96	GET	undefined	/api/docs/swagger-ui-init.js
+20240517	21:32:24	ebd746a6-37b6-4268-968d-3d30203bdd09	GET	undefined	/api/docs/favicon-32x32.png
+20240517	21:37:49	a90c99b3-a50e-4844-b3d0-ec9769170edb	GET	undefined	/api/docs/
+20240517	21:37:49	475f9f51-c80c-4ac7-9511-15a2f2e8b1a8	GET	undefined	/api/docs/swagger-ui.css
+20240517	21:37:49	60c727a7-771a-4c40-a63f-8f10dad9df47	GET	undefined	/api/docs/swagger-ui-bundle.js
+20240517	21:37:49	628627a4-9592-49df-87f3-ddbce3b40116	GET	undefined	/api/docs/swagger-ui-standalone-preset.js
+20240517	21:37:49	a5da5065-0142-48f5-b53b-c31e5ac007ea	GET	undefined	/api/docs/swagger-ui-init.js
+20240517	21:37:49	bf5fe76e-fcfc-4d17-a98c-83a195c0adf7	GET	undefined	/api/docs/favicon-32x32.png
