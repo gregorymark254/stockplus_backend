@@ -363,3 +363,9 @@
 20240517	21:37:49	628627a4-9592-49df-87f3-ddbce3b40116	GET	undefined	/api/docs/swagger-ui-standalone-preset.js
 20240517	21:37:49	a5da5065-0142-48f5-b53b-c31e5ac007ea	GET	undefined	/api/docs/swagger-ui-init.js
 20240517	21:37:49	bf5fe76e-fcfc-4d17-a98c-83a195c0adf7	GET	undefined	/api/docs/favicon-32x32.png
+20240517	21:44:49	2ada7437-7ae4-48be-b3a2-78749f62e573	GET	undefined	/api/docs/
+20240517	21:44:49	82a49998-4929-464d-a96c-42325bbc70f2	GET	undefined	/api/docs/swagger-ui.css
+20240517	21:44:49	57d1885d-a8c4-44a4-b6d3-6a079dcc8e6a	GET	undefined	/api/docs/swagger-ui-bundle.js
+20240517	21:44:49	04976dd6-3a59-4458-b9dc-f0417b2eecd8	GET	undefined	/api/docs/swagger-ui-standalone-preset.js
+20240517	21:44:49	be086204-8f7c-4ed9-853a-3b4208eb1c1e	GET	undefined	/api/docs/swagger-ui-init.js
+20240517	21:44:51	9c5532e3-a1ef-4662-8013-f40fb54c5447	GET	undefined	/api/docs/favicon-32x32.png
