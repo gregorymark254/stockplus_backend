@@ -25,5 +25,3 @@ const sqlconnect = () => {
 
 
 module.exports = { connection, sqlconnect };
-git remote add clever git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_cc18737e-26d4-4f7f-afbd-bb295d03ff4e.git
-git push clever master
