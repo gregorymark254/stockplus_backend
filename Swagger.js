@@ -1,3 +1,7 @@
+const router = require("express").Router()
+const swaggerJSDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
+
 const options = {
     definition: {
         openapi: '3.0.0',
@@ -8,7 +12,7 @@ const options = {
         },
         servers: [
             {
-                url: 'https://stockplus-backend.vercel.app'
+                url: 'http://localhost:4500'
             }
         ],
         components: {
@@ -29,24 +33,23 @@ const options = {
                 }
             },
             securitySchemes: {
-                OAuth2PasswordBearer: {
-                    type: 'oauth2',
-                    flows: {
-                        password: {
-                            tokenUrl: '/api/v1/login',
-                            scopes: {}
-                        }
-                    }
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'Bearer',
+                    description: 'Copy "Bearer: {token}" in the Authorization header use the docs.'
                 }
             }
         },
         security: [
             {
-                OAuth2PasswordBearer: []
+                bearerAuth: []
             }
         ]
     },
     apis: ['./Routes/*', './Server.js']
 };
 
-module.exports = options
+const swaggerSpec = swaggerJSDoc(options)
+router.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+
+module.exports = router
