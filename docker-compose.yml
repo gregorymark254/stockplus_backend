@@ -4,7 +4,7 @@ services:
     image: registry.gitlab.com/gregorymark25/stock_plus
     restart: unless-stopped
     volumes:
-      - ./logs:/app/logs
+      - ./logs:/app/log
     env_file:
       - .env
     networks:
