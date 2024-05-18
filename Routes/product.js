@@ -72,6 +72,46 @@ router.post('/createcategory', authUser, async (req, res) => {
 })
 
 
+// getting all categories
+/**
+ * @swagger
+ * /api/category:
+ *   get:
+ *     summary: Get all categories
+ *     description: Retrieve all categories from the database.
+ *     tags:
+ *       - products
+ *     responses:
+ *       200:
+ *         description: A list of categories.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: The category ID.
+ *                   name:
+ *                     type: string
+ *                     description: The name of the category.
+ *       500:
+ *         description: Failed to fetch categories.
+ */
+router.get('/category', authUser, (req, res) => {
+    const sql = 'SELECT * FROM category';
+    connection.query(sql ,(error, results) => {
+      if (error) {
+        console.error(error.message);
+        return res.status(500).json({ error: 'Failed to fetch categories' });
+      }
+      res.json(results);
+    });
+});
+  
+
 //getting all suppliers
 /**
  * @swagger
@@ -446,6 +486,54 @@ router.get('/products', authUser, async (req, res) => {
 })
 
 //getting all products by supplier Id
+/**
+ * @swagger
+ * /api/products/{supplierId}:
+ *   get:
+ *     summary: Get all products by supplier ID
+ *     description: Retrieve all products associated with a specific supplier based on the supplier ID.
+ *     tags:
+ *       - products
+ *     parameters:
+ *       - in: path
+ *         name: supplierId
+ *         required: true
+ *         description: ID of the supplier
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         description: Limit the number of products returned
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: offset
+ *         description: Offset for pagination
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: search
+ *         description: Search query to filter products by name
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of products.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of products.
+ *                 results:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *       500:
+ *         description: Failed to fetch supplier products.
+ */
 router.get('/products/:supplierId', authUser, async (req, res) => {
     const id = req.params.supplierId;
     const { limit, offset, search } = req.query;
@@ -470,10 +558,10 @@ router.get('/products/:supplierId', authUser, async (req, res) => {
 
     let countSql;
     if (search) {
-        countSql = 'SELECT COUNT(*) AS product FROM suppliers WHERE productName LIKE ?';
+        countSql = 'SELECT COUNT(*) AS total FROM suppliers WHERE productName LIKE ?';
         params.push(searchValue);
     } else {
-        countSql = 'SELECT COUNT(*) AS product FROM suppliers where supplierId = ?';
+        countSql = 'SELECT COUNT(*) AS total FROM suppliers where supplierId = ?';
         params.push(id);
     }
     
@@ -491,7 +579,7 @@ router.get('/products/:supplierId', authUser, async (req, res) => {
         connection.query(sql, params, (error, results) => {
         if (error) {
             console.error(error.message);
-            return res.status(500).json({ error: 'Failed to fetch products' });
+            return res.status(500).json({ error: 'Failed to fetch supplier products' });
         }
         
         // Returning results along with total rows for pagination

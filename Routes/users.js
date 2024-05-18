@@ -130,7 +130,7 @@ router.post('/login', (req, res) => {
       // Generate JWT tokens
       const accessToken = jwt.sign({ firstName: user.firstName, role: user.role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
       
-      res.status(200).json({ accessToken, firstName: user.firstName, role: user.role });
+      res.status(200).json({ accessToken, userId: user.userId, firstName: user.firstName, lastName: user.lastName, role: user.role });
     } else {
       res.status(401).json({ message: 'Invalid Password' });
     }

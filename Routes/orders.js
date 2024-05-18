@@ -181,18 +181,106 @@ router.get('/orders', authUser, async (req, res) => {
     });
 })
 
-//getting order details by id
-router.get('/order/:orderId', authUser, (req, res) => {
-    const id = req.params.orderId;
-    const sql = 'SELECT * FROM orderDetails WHERE orderId = ?';
-  
-    connection.query(sql, [id], (error, results, fields) => {
-      if (error) {
-        console.error(error.message);
-        return res.status(500).json({ error: 'Mysql fetchby id Error' });
-      }
-      res.json(results[0]);
+//getting all orders details by userid
+/**
+ * @swagger
+ * /api/orders/{userId}:
+ *   get:
+ *     summary: Get all orders details by user ID
+ *     description: Retrieve all orders associated with a specific user based on the user ID.
+ *     tags:
+ *       - orders
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         description: ID of the user
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         description: Limit the number of orders returned
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: offset
+ *         description: Offset for pagination
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: search
+ *         description: Search query to filter orders by product ID
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: A list of orders.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of orders.
+ *                 results:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Order'
+ *       500:
+ *         description: Failed to fetch user orders.
+ */
+router.get('/orders/:userId', authUser, async (req, res) => {
+    const id = req.params.userId;
+    const { limit, offset, search } = req.query;
+    const limitValue = parseInt(limit) || 100;
+    const offsetValue = parseInt(offset) || 0;
+
+    let sql;
+    let searchValue;
+    const params = [];
+
+    if (search) {
+        sql = `SELECT * FROM orders WHERE productId LIKE ? LIMIT ? OFFSET ?`;
+        searchValue = `%${search}%`;
+        params.push(searchValue);
+    } else {
+        sql = 'SELECT * FROM orders where userId = ? LIMIT ? OFFSET ?';
+        params.push(id);
+    }
+
+    params.push(limitValue);
+    params.push(offsetValue);
+
+    let countSql;
+    if (search) {
+        countSql = 'SELECT COUNT(*) AS total FROM orders WHERE productId LIKE ?';
+    } else {
+        countSql = 'SELECT COUNT(*) AS total FROM orders where userId = ?';
+        params.push(id);
+    }
+    
+
+    // Execute count query to get total rows
+    connection.query(countSql, [id, searchValue], (countErr, countResults) => {
+        if (countErr) {
+        console.error(countErr.message);
+        return res.status(500).json({ error: 'Failed to get total' });
+        }
+
+        const totalRows = countResults[0].total;
+
+        // Execute main query to fetch data with search condition
+        connection.query(sql, params, (error, results) => {
+        if (error) {
+            console.error(error.message);
+            return res.status(500).json({ error: 'Failed to fetch user orders' });
+        }
+        
+        // Returning results along with total rows for pagination
+        res.json({ total: totalRows, results: results });
+        });
     });
-  });
+})
 
 module.exports = router
