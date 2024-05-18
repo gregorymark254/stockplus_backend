@@ -63,14 +63,14 @@ const authUser = require('../Middleware/authUser');
  *                   example: Error creating order
  */
 router.post("/orders", authUser, async (req,res) => {
-    const { orderDate, amount, userId } = req.body;
+    const { userId, productId, quantity, amount } = req.body;
 
-    if (!orderDate || !amount || !userId) {
+    if (!userId || !productId || !quantity || !amount) {
         return res.status(400).json({error: "All fields are required"})
     }
 
-    const sql = `INSERT INTO orders (orderDate,amount,userId) VALUES (?,?,?)`;
-    connection.query(sql, [orderDate,amount,userId], (err, result) => {
+    const sql = `INSERT INTO orders (userId, productId, quantity, amount) VALUES (?,?,?,?)`;
+    connection.query(sql, [userId, productId, quantity, amount], (err, result) => {
         if (err) {
             console.log(err);
             return res.status(500).json({error: 'Error creating order'})
@@ -181,61 +181,18 @@ router.get('/orders', authUser, async (req, res) => {
     });
 })
 
-
-// adding order details
-/**
- * @swagger
- * /orderdetails:
- *   post:
- *     summary: Add order details
- *     description: Add details of an order including quantity, price, product ID, and order ID.
- *     tags:
- *       - orders
- *     parameters:
- *       - in: body
- *         name: OrderDetails
- *         description: Details of the order to be added.
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             quantity:
- *               type: integer
- *               description: The quantity of the product.
- *             price:
- *               type: number
- *               description: The price of the product.
- *             productId:
- *               type: integer
- *               description: The ID of the product.
- *             orderId:
- *               type: integer
- *               description: The ID of the order.
- *     responses:
- *       200:
- *         description: Successfully created order details.
- *       400:
- *         description: Bad request. All fields are required.
- *       401:
- *         description: Unauthorized. User not authenticated.
- *       500:
- *         description: Internal server error. Failed to create order details.
- */
-router.post("/orderdetails", authUser, async (req,res) => {
-    const { quantity, price, productId, orderId } = req.body;
-    if (!quantity || !price || !productId || !orderId) {
-        return res.status(400).json({error: "All fields are required"})
-    }
-
-    const sql = `INSERT INTO orderDetails (quantity, price, productId, orderId) VALUES (?,?,?,?)`;
-    connection.query(sql, [quantity, price, productId, orderId], (err, result) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({error: 'Error creating order'})
-        } 
-        res.status(200).json({message: 'order details created successfully'})
-    })
-})
-
+//getting order details by id
+router.get('/order/:orderId', authUser, (req, res) => {
+    const id = req.params.orderId;
+    const sql = 'SELECT * FROM orderDetails WHERE orderId = ?';
+  
+    connection.query(sql, [id], (error, results, fields) => {
+      if (error) {
+        console.error(error.message);
+        return res.status(500).json({ error: 'Mysql fetchby id Error' });
+      }
+      res.json(results[0]);
+    });
+  });
 
 module.exports = router

@@ -445,4 +445,59 @@ router.get('/products', authUser, async (req, res) => {
     });
 })
 
+//getting all products by supplier Id
+router.get('/products/:supplierId', authUser, async (req, res) => {
+    const id = req.params.supplierId;
+    const { limit, offset, search } = req.query;
+    const limitValue = parseInt(limit) || 100;
+    const offsetValue = parseInt(offset) || 0;
+
+    let sql;
+    let searchValue;
+    const params = [];
+
+    if (search) {
+        sql = `SELECT * FROM product WHERE productName LIKE ? LIMIT ? OFFSET ?`;
+        searchValue = `%${search}%`;
+        params.push(searchValue);
+    } else {
+        sql = 'SELECT * FROM product where supplierId = ? LIMIT ? OFFSET ?';
+        params.push(id);
+    }
+
+    params.push(limitValue);
+    params.push(offsetValue);
+
+    let countSql;
+    if (search) {
+        countSql = 'SELECT COUNT(*) AS product FROM suppliers WHERE productName LIKE ?';
+        params.push(searchValue);
+    } else {
+        countSql = 'SELECT COUNT(*) AS product FROM suppliers where supplierId = ?';
+        params.push(id);
+    }
+    
+
+    // Execute count query to get total rows
+    connection.query(countSql, [id,searchValue], (countErr, countResults) => {
+        if (countErr) {
+        console.error(countErr.message);
+        return res.status(500).json({ error: 'Failed to get total' });
+        }
+
+        const totalRows = countResults[0].total;
+
+        // Execute main query to fetch data with search condition
+        connection.query(sql, params, (error, results) => {
+        if (error) {
+            console.error(error.message);
+            return res.status(500).json({ error: 'Failed to fetch products' });
+        }
+        
+        // Returning results along with total rows for pagination
+        res.json({ total: totalRows, results: results });
+        });
+    });
+})
+
 module.exports = router;
