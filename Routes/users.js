@@ -183,7 +183,7 @@ router.get('/users', authUser, (req, res) => {
   connection.query(countSql, [searchValue], (countErr, countResults) => {
     if (countErr) {
       console.error(countErr.message);
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ error: 'Failed to get total' });
     }
 
     const totalRows = countResults[0].total;
@@ -192,7 +192,7 @@ router.get('/users', authUser, (req, res) => {
     connection.query(sql, params, (error, results) => {
       if (error) {
         console.error(error.message);
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Failed to fetch users' });
       }
       
       // Returning results along with total rows for pagination
