@@ -174,11 +174,11 @@ router.get('/suppliers', authUser, async (req, res) => {
     const params = [];
 
     if (search) {
-        sql = `SELECT * FROM suppliers WHERE supplierName LIKE ? LIMIT ? OFFSET ?`;
+        sql = `SELECT * FROM suppliers WHERE email LIKE ? ORDER BY createdAt DESC LIMIT ? OFFSET ?`;
         searchValue = `%${search}%`;
         params.push(searchValue);
     } else {
-        sql = 'SELECT * FROM suppliers LIMIT ? OFFSET ?';
+        sql = 'SELECT * FROM suppliers ORDER BY createdAt DESC LIMIT ? OFFSET ?';
     }
 
     params.push(limitValue);
@@ -186,7 +186,7 @@ router.get('/suppliers', authUser, async (req, res) => {
 
     let countSql;
     if (search) {
-        countSql = 'SELECT COUNT(*) AS total FROM suppliers WHERE supplierName LIKE ?';
+        countSql = 'SELECT COUNT(*) AS total FROM suppliers WHERE email LIKE ?';
     } else {
         countSql = 'SELECT COUNT(*) AS total FROM suppliers';
     }
@@ -445,11 +445,14 @@ router.get('/products', authUser, async (req, res) => {
     const params = [];
 
     if (search) {
-        sql = `SELECT * FROM product WHERE productName LIKE ? LIMIT ? OFFSET ?`;
+        sql = `SELECT * FROM product WHERE productName LIKE ? ORDER BY createdAt DESC LIMIT ? OFFSET ?`;
         searchValue = `%${search}%`;
         params.push(searchValue);
     } else {
-        sql = 'SELECT * FROM product LIMIT ? OFFSET ?';
+        sql = `select productId,productName,productDescription,productPrice,stocklevel,supplierName,categoryName 
+            from product
+            INNER JOIN category ON product.categoryId = category.categoryId
+            INNER JOIN suppliers ON product.supplierId = suppliers.supplierId ORDER BY product.createdAt DESC LIMIT ? OFFSET ?`;
     }
 
     params.push(limitValue);
@@ -545,11 +548,18 @@ router.get('/products/:supplierId', authUser, async (req, res) => {
     const params = [];
 
     if (search) {
-        sql = `SELECT * FROM product WHERE productName LIKE ? LIMIT ? OFFSET ?`;
+        sql = `SELECT * FROM product 
+            INNER JOIN category ON product.categoryId = category.categoryId 
+            INNER JOIN suppliers ON product.supplierId = suppliers.supplierId 
+            WHERE productName LIKE ? ORDER BY product.createdAt DESC LIMIT ? OFFSET ?`;
         searchValue = `%${search}%`;
         params.push(searchValue);
     } else {
-        sql = 'SELECT * FROM product where supplierId = ? LIMIT ? OFFSET ?';
+        sql = `select productId,productName,productDescription,productPrice,stocklevel,supplierName,categoryName 
+            from product 
+            INNER JOIN category ON product.categoryId = category.categoryId 
+            INNER JOIN suppliers ON product.supplierId = suppliers.supplierId 
+            where product.supplierId = ? ORDER BY product.createdAt DESC LIMIT ? OFFSET ?`;
         params.push(id);
     }
 
@@ -558,10 +568,10 @@ router.get('/products/:supplierId', authUser, async (req, res) => {
 
     let countSql;
     if (search) {
-        countSql = 'SELECT COUNT(*) AS total FROM suppliers WHERE productName LIKE ?';
+        countSql = `SELECT COUNT(*) AS total FROM product WHERE productName LIKE ?`;
         params.push(searchValue);
     } else {
-        countSql = 'SELECT COUNT(*) AS total FROM suppliers where supplierId = ?';
+        countSql = 'SELECT COUNT(*) AS total FROM product where supplierId = ?';
         params.push(id);
     }
     

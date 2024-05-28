@@ -75,7 +75,15 @@ router.post("/orders", authUser, async (req,res) => {
             console.log(err);
             return res.status(500).json({error: 'Error creating order'})
         } 
-        res.status(200).json({message: 'order created successfully'})
+        const orderId = result.insertId;
+        const updateSql = `UPDATE orders SET paymentStatus = 'paid' WHERE orderId = ?`;
+        connection.query(updateSql, [orderId], (updateErr, updateResult) => {
+            if (updateErr) {
+                console.log(updateErr);
+                return res.status(500).json({ error: 'Error updating payment status' });
+            }
+            res.status(200).json({ message: 'Order created successfully', orderId: orderId });
+        });
     })
 })
 
@@ -141,11 +149,15 @@ router.get('/orders', authUser, async (req, res) => {
     const params = [];
 
     if (search) {
-        sql = `SELECT * FROM orders WHERE orderId LIKE ? LIMIT ? OFFSET ?`;
+        sql = `SELECT * FROM orders WHERE orderId LIKE ? ORDER BY createdAt DESC LIMIT ? OFFSET ?`;
         searchValue = `%${search}%`;
         params.push(searchValue);
     } else {
-        sql = 'SELECT * FROM orders LIMIT ? OFFSET ?';
+        sql = `select orderId,firstName,email,productName,quantity,amount,status,paymentStatus,orders.createdAt
+            from orders 
+            INNER JOIN product ON orders.productId = product.productId 
+            INNER JOIN users ON orders.userId = users.userId 
+            ORDER BY orders.createdAt DESC LIMIT ? OFFSET ?`;
     }
 
     params.push(limitValue);
@@ -241,11 +253,15 @@ router.get('/orders/:userId', authUser, async (req, res) => {
     const params = [];
 
     if (search) {
-        sql = `SELECT * FROM orders WHERE productId LIKE ? LIMIT ? OFFSET ?`;
+        sql = `SELECT * FROM orders WHERE productId LIKE ? ORDER BY createdAt DESC LIMIT ? OFFSET ?`;
         searchValue = `%${search}%`;
         params.push(searchValue);
     } else {
-        sql = 'SELECT * FROM orders where userId = ? LIMIT ? OFFSET ?';
+        sql = `select orderId,firstName,email,productName,quantity,amount,status,paymentStatus,orders.createdAt
+            from orders 
+            INNER JOIN product ON orders.productId = product.productId 
+            INNER JOIN users ON orders.userId = users.userId  
+            where orders.userId = ? ORDER BY createdAt DESC LIMIT ? OFFSET ?`;
         params.push(id);
     }
 

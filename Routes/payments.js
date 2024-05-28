@@ -66,20 +66,19 @@ const authUser = require('../Middleware/authUser');
  */
 
 router.post('/payment', authUser, async (req,res) => {
-    const { amount, paymentMethod, paymentDate, orderId } = req.body;
+    const { amount, paymentMethod, orderId } = req.body;
 
-    if (!amount || !paymentMethod || !paymentDate || !orderId) {
+    if (!amount || !paymentMethod || !orderId) {
         return res.status(400).json('All fields are required')
     }
 
-    const sql = `INSERT INTO payments (amount,paymentMethod,paymentDate,orderId) values(?,?,?,?)`;
-    connection.query(sql, [amount,paymentMethod,paymentDate,orderId], (err,result) =>{
+    const sql = `INSERT INTO payments (amount,paymentMethod,orderId) values(?,?,?)`;
+    connection.query(sql, [amount,paymentMethod,orderId], (err,result) =>{
         if (err) {
             console.log(err);
             return res.status(500).json({error: 'Error while saving payment'})
         }
         return res.status(200).json({message: 'Payment saved successfully'})
-            
     })
 })
 
@@ -143,11 +142,15 @@ router.get('/payments', authUser, async (req, res) => {
     const params = [];
 
     if (search) {
-        sql = `SELECT * FROM payments WHERE paymentId LIKE ? LIMIT ? OFFSET ?`;
+        sql = `SELECT * FROM payments WHERE paymentId LIKE ? ORDER BY paymentDate DESC LIMIT ? OFFSET ?`;
         searchValue = `%${search}%`;
         params.push(searchValue);
     } else {
-        sql = 'SELECT * FROM payments LIMIT ? OFFSET ?';
+        sql = `select paymentId, payments.orderId,payments.amount,paymentMethod,paymentDate,phoneNUmber
+                from payments 
+                INNER JOIN orders ON payments.orderId = orders.orderId
+                INNER JOIN users on orders.userId = users.userId 
+                ORDER BY paymentDate DESC LIMIT ? OFFSET ?`;
     }
 
     params.push(limitValue);
