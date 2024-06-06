@@ -167,7 +167,7 @@ router.post('/forgotpassword', async (req, res) => {
       }
 
       // Check if OTP already exists for the phone number
-      const checkExistingOTPQuery = 'SELECT id FROM otp WHERE phoneNumber = ?';
+      const checkExistingOTPQuery = 'SELECT * FROM otp WHERE phoneNumber = ?';
       connection.query(checkExistingOTPQuery, [msisdn], async (err, results) => {
         if (err) {
           console.log(err);
