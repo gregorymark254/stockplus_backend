@@ -11,7 +11,7 @@ const users = require('./Routes/users')
 const product = require('./Routes/product')
 const orders = require('./Routes/orders')
 const payment = require('./Routes/payments')
-
+const mpesa = require('./Routes/mpesa')
 // connection to mysqldatabase
 sqlconnect();
 
@@ -30,6 +30,7 @@ app.use("/api", users); // users
 app.use("/api", product); // products
 app.use("/api", orders); // orders
 app.use("/api", payment); // payments
+app.use("/api", mpesa); // mpesa
 
 // Error handler
 app.use(errorHandler);

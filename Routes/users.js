@@ -3,6 +3,7 @@ const { connection } = require('../Db/dbConfig');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authUser = require('../Middleware/authUser');
+const authorize = require('../Middleware/authorize')
 
 // register user
 /**
@@ -128,7 +129,7 @@ router.post('/login', (req, res) => {
     const isValid = await bcrypt.compare(password, user.password);
     if (isValid) {
       // Generate JWT tokens
-      const accessToken = jwt.sign({ firstName: user.firstName, role: user.role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+      const accessToken = jwt.sign({ email: user.email, role: user.role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
       
       res.status(200).json({ accessToken, userId: user.userId, firstName: user.firstName, lastName: user.lastName, role: user.role });
     } else {
@@ -152,7 +153,7 @@ router.post('/login', (req, res) => {
  *       500:
  *         description: Internal server error
  */
-router.get('/users', authUser, (req, res) => {
+router.get('/users', authUser, authorize(['admin']), (req, res) => {
   const { limit, offset, search } = req.query;
   const limitValue = parseInt(limit) || 100;
   const offsetValue = parseInt(offset) || 0;
