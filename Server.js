@@ -12,6 +12,7 @@ const product = require('./Routes/product')
 const orders = require('./Routes/orders')
 const payment = require('./Routes/payments')
 const mpesa = require('./Routes/mpesa')
+
 // connection to mysqldatabase
 sqlconnect();
 

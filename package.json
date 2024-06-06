@@ -24,6 +24,7 @@
     "mysql": "^2.18.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.2",
+    "twilio": "^5.1.1",
     "uuid": "^9.0.1"
   }
 }

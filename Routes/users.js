@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authUser = require('../Middleware/authUser');
 const authorize = require('../Middleware/authorize')
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require('twilio')(accountSid, authToken);
 
 // register user
 /**
@@ -137,6 +140,136 @@ router.post('/login', (req, res) => {
     }
   });
 });
+
+//Send otp
+router.post('/forgotpassword', async (req, res) => {
+  try {
+    const { msisdn } = req.body;
+    const getUser = `SELECT * FROM users WHERE phoneNumber = ?`;
+    
+    connection.query(getUser, [msisdn], async (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ message: 'MySql login error' });
+        return;
+      }
+  
+      if (!results.length) {
+        res.status(400).json({ message: 'Number not found' });
+        return;
+      }
+
+      // Generate OTP
+      let digits = '0123456789';
+      let OTP = '';
+      for (let i = 0; i < 4; i++) {
+        OTP += digits[Math.floor(Math.random() * 10)];
+      }
+
+      // Check if OTP already exists for the phone number
+      const checkExistingOTPQuery = 'SELECT id FROM otp WHERE phoneNumber = ?';
+      connection.query(checkExistingOTPQuery, [msisdn], async (err, results) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json({ message: 'Error checking existing OTP in database' });
+          return;
+        }
+
+        if (results.length) {
+          // Update existing OTP
+          const updateOTPQuery = 'UPDATE otp SET otp = ? WHERE phoneNumber = ?';
+          connection.query(updateOTPQuery, [OTP, msisdn], async (err, result) => {
+            if (err) {
+              console.log(err);
+              res.status(500).json({ message: 'Error updating OTP in database' });
+              return;
+            }
+            // Send OTP via Twilio
+            try {
+              await client.messages.create({
+                from: process.env.TWILIO_PHONE_NUMBER,
+                to: `+254${msisdn}`,
+                body: `Your OTP code is ${OTP}`
+              });
+              res.status(200).json({ message: `OTP updated and sent to +254${msisdn}` });
+            } catch (error) {
+              console.log(error);
+              res.status(500).json({ message: 'Error sending OTP via Twilio' });
+            }
+          });
+        } else {
+          // Insert new OTP
+          const insertOTPQuery = 'INSERT INTO otp (otp, phoneNumber) VALUES (?, ?)';
+          connection.query(insertOTPQuery, [OTP, msisdn], async (err, result) => {
+            if (err) {
+              console.log(err);
+              res.status(500).json({ message: 'Error inserting OTP into database' });
+              return;
+            }
+            // Send OTP via Twilio
+            try {
+              await client.messages.create({
+                from: process.env.TWILIO_PHONE_NUMBER,
+                to: `+254${msisdn}`,
+                body: `Your OTP code is ${OTP}`
+              });
+              res.status(200).json({ message: `OTP sent to +254${msisdn}` });
+            } catch (error) {
+              console.log(error);
+              res.status(500).json({ message: 'Error sending OTP via Twilio' });
+            }
+          });
+        }
+      });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json(error);
+  }
+});
+
+//reset password
+router.post('/resetpassword', async (req, res) => {
+  try {
+    const { phoneNumber, otp, password } = req.body;
+
+    // Check if OTP matches the one stored in the database
+    const checkOTPQuery = 'SELECT * FROM otp WHERE phoneNumber = ? AND otp = ?';
+    connection.query(checkOTPQuery, [phoneNumber, otp], async (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ message: 'Database error' });
+        return;
+      }
+
+      if (!results.length) {
+        res.status(400).json({ message: 'Invalid OTP' });
+        return;
+      }
+
+    // If OTP is valid, update the user's password
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
+      const updatePasswordQuery = 'UPDATE users SET password = ? WHERE phoneNumber = ?';
+      connection.query(updatePasswordQuery, [hashedPassword, phoneNumber], async (err, result) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json({ message: 'Error updating password' });
+          return;
+        }
+
+        res.status(200).json({ message: 'Password reset successful' });
+      });
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: 'An error occurred' });
+  }
+});
+
+
+
 
 // get all users
 /**
