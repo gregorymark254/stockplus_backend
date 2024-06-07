@@ -68,8 +68,12 @@ router.post("/callback", (req, res) => {
   // Log the callback data to the console
   console.log(callbackData);
 
-  // Send a response back to the M-Pesa
-  res.json({ status: 'success' });
+  if (!callbackData.Body.stkCallback.CallbackMetadata) {
+    console.log(callbackData.Body)
+    return res.status(200).json("OK")
+}
+console.log(callbackData.Body.stkCallback.CallbackMetadata)
+res.status(200)
 });
 
   
