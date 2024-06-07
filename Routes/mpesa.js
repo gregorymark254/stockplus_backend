@@ -22,6 +22,7 @@ const generateToken = async (req,res,next) => {
 };
 
 // sending stk push
+// sending stk push
 router.post("/stk", generateToken , async (req, res) => {
  
   const phone = req.body.phone;
@@ -54,22 +55,27 @@ router.post("/stk", generateToken , async (req, res) => {
     }
   )
   .then((data) => {
-    console.log(data.data)
-    res.status(200).json(data.data)
+      console.log(data.data)
+      res.status(200).json(data.data)
   })
   .catch((err) => {
-    console.log(err.message)
+      console.log(err.message)
   })
 });
 
 
 router.post("/callback", (req, res) => {
   const callbackData = req.body;
+  // Log the callback data to the console
+  console.log(callbackData);
+
+  // Send a response back to the M-Pesa
+  res.json({ status: 'success' });
+
   console.log(
     "INFO",
     `\nINFO:M-PESA STK PUSH RESULTS,\nMerchantRequestID:${callbackData.Body.stkCallback.MerchantRequestID},\nCheckoutRequestID:${callbackData.Body.stkCallback.CheckoutRequestID},\nResultCode:${callbackData.Body.stkCallback.ResultCode},\nResultDescription:${callbackData.Body.stkCallback.ResultDesc}`
   );
-  console.log(callbackData)
 
   if (callbackData.Body.stkCallback.CallbackMetadata) {
     const items = callbackData.Body.stkCallback.CallbackMetadata.Item;
@@ -85,6 +91,17 @@ router.post("/callback", (req, res) => {
   console.log(MerchantRequestID)
   console.log(safaricomResponse)
 
+});
+
+
+router.post("/callback", (req, res) => {
+  const callbackData = req.body;
+
+  // Log the callback data to the console
+  console.log(callbackData);
+
+  // Send a response back to the M-Pesa
+  res.json({ status: 'success' });
 });
 
   
