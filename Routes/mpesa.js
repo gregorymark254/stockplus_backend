@@ -69,27 +69,6 @@ router.post("/callback", (req, res) => {
   // Log the callback data to the console
   console.log(callbackData);
 
-
-
-  console.log(
-    "INFO",
-    `\nINFO:M-PESA STK PUSH RESULTS,\nMerchantRequestID:${callbackData.Body.stkCallback.MerchantRequestID},\nCheckoutRequestID:${callbackData.Body.stkCallback.CheckoutRequestID},\nResultCode:${callbackData.Body.stkCallback.ResultCode},\nResultDescription:${callbackData.Body.stkCallback.ResultDesc}`
-  );
-
-  if (callbackData.Body.stkCallback.CallbackMetadata) {
-    const items = callbackData.Body.stkCallback.CallbackMetadata.Item;
-    const values = items.map((item) => item.Value);
-    console.log(
-      "INFO",
-      `\nINFO:M-PESA STK PUSH RESULTS,\nAmount:${values[0]},\nMpesaReceiptNumber:${values[1]},\nTransactionDate:${values[3]},\nPhoneNumber:${values[4]}`
-    );
-  }
-
-  const MerchantRequestID = callbackData.Body.stkCallback.MerchantRequestID;
-  const safaricomResponse = callbackData.Body.stkCallback.ResultDesc;
-  console.log(MerchantRequestID)
-  console.log(safaricomResponse)
-
     // Send a response back to the M-Pesa
     res.json({ status: 'success' });
 });
