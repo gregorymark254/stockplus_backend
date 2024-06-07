@@ -75,7 +75,6 @@ router.post("/callback", (req, res) => {
 
 
   console.log(callbackData.Body.stkCallback.CallbackMetadata)
-    res.status(200)
 
     const id = callbackData.Body.stkCallback.CallbackMetadata.Item[3].Value
     const phone = callbackData.Body.stkCallback.CallbackMetadata.Item[4].Value
