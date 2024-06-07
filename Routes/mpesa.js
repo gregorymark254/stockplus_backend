@@ -68,6 +68,7 @@ router.post("/callback", (req, res) => {
     "INFO",
     `\nINFO:M-PESA STK PUSH RESULTS,\nMerchantRequestID:${callbackData.Body.stkCallback.MerchantRequestID},\nCheckoutRequestID:${callbackData.Body.stkCallback.CheckoutRequestID},\nResultCode:${callbackData.Body.stkCallback.ResultCode},\nResultDescription:${callbackData.Body.stkCallback.ResultDesc}`
   );
+  console.log(callbackData)
 
   if (callbackData.Body.stkCallback.CallbackMetadata) {
     const items = callbackData.Body.stkCallback.CallbackMetadata.Item;
