@@ -63,46 +63,59 @@ router.post("/stk", generateToken , async (req, res) => {
   }
 });
 
+router.post("/callback/:orderId", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { Body: { stkCallback } } = req.body;
 
-router.post("/callback/:orderId",  async (req, res) => {
-  const callbackData = req.body;
-  console.log(callbackData)
+    const { MerchantRequestID, CheckoutRequestID, ResultCode, ResultDesc, CallbackMetadata } = stkCallback;
 
-  try{
-    //order id
-    const orderId = req.params;
-    
-    //callback details
-    const {MerchantRequestID,CheckoutRequestID,ResultCode,ResultDesc,CallbackMetadata} = req.body.Body.stkCallback
+    // Extract metadata
+    const meta = Object.values(CallbackMetadata.Item);
+    const PhoneNumber = meta.find(o => o.Name === 'PhoneNumber').Value.toString();
+    const Amount = meta.find(o => o.Name === 'Amount').Value.toString();
+    const MpesaReceiptNumber = meta.find(o => o.Name === 'MpesaReceiptNumber').Value.toString();
+    const TransactionDate = meta.find(o => o.Name === 'TransactionDate').Value.toString();
 
-    // get the meta data from the meta
-    const meta = Object.values(await CallbackMetadata.Item)
-    const PhoneNumber = meta.find(o => o.Name === 'PhoneNumber').Value.toString()
-    const Amount = meta.find(o => o.Name === 'Amount').Value.toString()
-    const MpesaReceiptNumber = meta.find(o => o.Name === 'MpesaReceiptNumber').Value.toString()
-    const TransactionDate = meta.find(o => o.Name === 'TransactionDate').Value.toString()
-
-    // do something with the data
-    console.log("-".repeat(20)," OUTPUT IN THE CALLBACK ", "-".repeat(20))
+    console.log("-".repeat(20), " OUTPUT IN THE CALLBACK ", "-".repeat(20));
     console.log(`
-        Order_ID : ${orderId},
-        MerchantRequestID : ${MerchantRequestID},
-        CheckoutRequestID: ${CheckoutRequestID},
-        ResultCode: ${ResultCode},
-        ResultDesc: ${ResultDesc},
-        PhoneNumber : ${PhoneNumber},
-        Amount: ${Amount}, 
-        MpesaReceiptNumber: ${MpesaReceiptNumber},
-        TransactionDate : ${TransactionDate}
-    `)
-      res.json(true)
-    } catch (error) {
-        console.error("Error while trying to update LipaNaMpesa details from the callback",error)
-        res.status(503).send({
-            message:"Something went wrong with the callback",
-            error : error.message
-        })
-    }
+      Order_ID : ${orderId},
+      MerchantRequestID : ${MerchantRequestID},
+      CheckoutRequestID: ${CheckoutRequestID},
+      ResultCode: ${ResultCode},
+      ResultDesc: ${ResultDesc},
+      PhoneNumber : ${PhoneNumber},
+      Amount: ${Amount}, 
+      MpesaReceiptNumber: ${MpesaReceiptNumber},
+      TransactionDate : ${TransactionDate}
+    `);
+
+    // Insert payment data into database
+    const sql = `INSERT INTO payments (amount, paymentMethod, orderId) VALUES (?, ?, ?)`;
+    connection.query(sql, [Amount, 'Mpesa', orderId], (err, result) => {
+      if (err) {
+        console.error("Error creating payment:", err);
+        return res.status(500).json({ error: 'Error creating payment' });
+      } 
+
+      // Update order payment status
+      const updateSql = `UPDATE orders SET paymentStatus = 'paid' WHERE orderId = ?`;
+      connection.query(updateSql, [orderId], (updateErr, updateResult) => {
+        if (updateErr) {
+          console.error("Error updating payment status:", updateErr);
+          return res.status(500).json({ error: 'Error updating payment status' });
+        }
+        console.log("Payment created and order status updated successfully");
+        res.status(200).json({ message: 'Payment created and order status updated successfully' });
+      });
+    });
+  } catch (error) {
+    console.error("Error handling callback:", error);
+    res.status(503).send({
+      message: "Something went wrong with the callback",
+      error: error.message
+    });
+  }
 });
 
   

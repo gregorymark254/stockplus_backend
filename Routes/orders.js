@@ -75,15 +75,7 @@ router.post("/orders", authUser, async (req,res) => {
             console.log(err);
             return res.status(500).json({error: 'Error creating order'})
         } 
-        const orderId = result.insertId;
-        const updateSql = `UPDATE orders SET paymentStatus = 'paid' WHERE orderId = ?`;
-        connection.query(updateSql, [orderId], (updateErr, updateResult) => {
-            if (updateErr) {
-                console.log(updateErr);
-                return res.status(500).json({ error: 'Error updating payment status' });
-            }
-            res.status(200).json({ message: 'Order created successfully', orderId: orderId });
-        });
+        res.status(200).json({ message: 'Order created successfully', orderId: orderId });
     })
 })
 
