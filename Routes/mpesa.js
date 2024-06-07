@@ -63,59 +63,64 @@ router.post("/stk", generateToken , async (req, res) => {
   }
 });
 
-router.post("/callback/:orderId", async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const { Body: { stkCallback } } = req.body;
+router.post("/callback/:orderId", (req, res) => {
+  const { orderId } = req.params;
+  const { Body: { stkCallback } } = req.body;
+  console.log(orderId)
+  console.log(stkCallback)
+  res.status(200).json('ok')
+  // try {
+  //   const { orderId } = req.params;
+  //   const { Body: { stkCallback } } = req.body;
 
-    const { MerchantRequestID, CheckoutRequestID, ResultCode, ResultDesc, CallbackMetadata } = stkCallback;
+  //   const { MerchantRequestID, CheckoutRequestID, ResultCode, ResultDesc, CallbackMetadata } = stkCallback;
 
-    // Extract metadata
-    const meta = Object.values(CallbackMetadata.Item);
-    const PhoneNumber = meta.find(o => o.Name === 'PhoneNumber').Value.toString();
-    const Amount = meta.find(o => o.Name === 'Amount').Value.toString();
-    const MpesaReceiptNumber = meta.find(o => o.Name === 'MpesaReceiptNumber').Value.toString();
-    const TransactionDate = meta.find(o => o.Name === 'TransactionDate').Value.toString();
+  //   // Extract metadata
+  //   const meta = Object.values(CallbackMetadata.Item);
+  //   const PhoneNumber = meta.find(o => o.Name === 'PhoneNumber').Value.toString();
+  //   const Amount = meta.find(o => o.Name === 'Amount').Value.toString();
+  //   const MpesaReceiptNumber = meta.find(o => o.Name === 'MpesaReceiptNumber').Value.toString();
+  //   const TransactionDate = meta.find(o => o.Name === 'TransactionDate').Value.toString();
 
-    console.log("-".repeat(20), " OUTPUT IN THE CALLBACK ", "-".repeat(20));
-    console.log(`
-      Order_ID : ${orderId},
-      MerchantRequestID : ${MerchantRequestID},
-      CheckoutRequestID: ${CheckoutRequestID},
-      ResultCode: ${ResultCode},
-      ResultDesc: ${ResultDesc},
-      PhoneNumber : ${PhoneNumber},
-      Amount: ${Amount}, 
-      MpesaReceiptNumber: ${MpesaReceiptNumber},
-      TransactionDate : ${TransactionDate}
-    `);
+  //   console.log("-".repeat(20), " OUTPUT IN THE CALLBACK ", "-".repeat(20));
+  //   console.log(`
+  //     Order_ID : ${orderId},
+  //     MerchantRequestID : ${MerchantRequestID},
+  //     CheckoutRequestID: ${CheckoutRequestID},
+  //     ResultCode: ${ResultCode},
+  //     ResultDesc: ${ResultDesc},
+  //     PhoneNumber : ${PhoneNumber},
+  //     Amount: ${Amount}, 
+  //     MpesaReceiptNumber: ${MpesaReceiptNumber},
+  //     TransactionDate : ${TransactionDate}
+  //   `);
 
-    // Insert payment data into database
-    const sql = `INSERT INTO payments (amount, paymentMethod, orderId) VALUES (?, ?, ?)`;
-    connection.query(sql, [Amount, 'Mpesa', orderId], (err, result) => {
-      if (err) {
-        console.error("Error creating payment:", err);
-        return res.status(500).json({ error: 'Error creating payment' });
-      } 
+  //   // Insert payment data into database
+  //   const sql = `INSERT INTO payments (amount, paymentMethod, orderId) VALUES (?, ?, ?)`;
+  //   connection.query(sql, [Amount, 'Mpesa', orderId], (err, result) => {
+  //     if (err) {
+  //       console.error("Error creating payment:", err);
+  //       return res.status(500).json({ error: 'Error creating payment' });
+  //     } 
 
-      // Update order payment status
-      const updateSql = `UPDATE orders SET paymentStatus = 'paid' WHERE orderId = ?`;
-      connection.query(updateSql, [orderId], (updateErr, updateResult) => {
-        if (updateErr) {
-          console.error("Error updating payment status:", updateErr);
-          return res.status(500).json({ error: 'Error updating payment status' });
-        }
-        console.log("Payment created and order status updated successfully");
-        res.status(200).json({ message: 'Payment created and order status updated successfully' });
-      });
-    });
-  } catch (error) {
-    console.error("Error handling callback:", error);
-    res.status(503).send({
-      message: "Something went wrong with the callback",
-      error: error.message
-    });
-  }
+  //     // Update order payment status
+  //     const updateSql = `UPDATE orders SET paymentStatus = 'paid' WHERE orderId = ?`;
+  //     connection.query(updateSql, [orderId], (updateErr, updateResult) => {
+  //       if (updateErr) {
+  //         console.error("Error updating payment status:", updateErr);
+  //         return res.status(500).json({ error: 'Error updating payment status' });
+  //       }
+  //       console.log("Payment created and order status updated successfully");
+  //       res.status(200).json({ message: 'Payment created and order status updated successfully' });
+  //     });
+  //   });
+  // } catch (error) {
+  //   console.error("Error handling callback:", error);
+  //   res.status(503).send({
+  //     message: "Something went wrong with the callback",
+  //     error: error.message
+  //   });
+  // }
 });
 
   

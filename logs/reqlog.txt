@@ -58,3 +58,8 @@
 20240607	13:48:19	bfe65d97-7325-4fd5-9a90-19afec919346	POST	undefined	/api/stk
 20240607	13:49:12	694e3c03-7883-4847-82d1-14406b10e640	POST	undefined	/api/stk
 20240607	13:52:19	335a4918-2b2b-47ea-92e1-0ff8a76440dc	POST	http://localhost:3000	/api/stk
+20240607	14:03:52	8a713e4b-24f3-4f6e-9ea2-306664249f5b	POST	undefined	/api/stk
+20240607	14:05:36	5e9a2495-5dc8-4b13-98d0-b58d4a1b1413	GET	http://localhost:3000	/api/orders/15?offset=0&limit=20&search=
+20240607	14:05:49	e10033c4-a36f-4ba2-a084-f5bb37fca4e6	POST	undefined	/api/stk
+20240607	14:06:44	fe66e96e-0bc0-4e07-9f86-617755bc9466	GET	http://localhost:3000	/api/orders/15?offset=0&limit=20&search=
+20240607	14:10:03	98ad8465-799f-4168-ac46-aa6e188d9d34	POST	undefined	/api/stk
