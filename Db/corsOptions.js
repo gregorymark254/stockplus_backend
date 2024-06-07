@@ -2,8 +2,9 @@
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://localhost:8080',
-  'https://stockplus.vercel.app'
+  'http://localhost:4000',
+  'https://stockplus.vercel.app',
+  'https://stockplusbackend.vercel.app'
 ];
 
 const corsOption = {

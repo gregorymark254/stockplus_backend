@@ -42,9 +42,9 @@ router.post("/stk", generateToken , async (req, res) => {
         PartyA : `254${phone}`,    
         PartyB : shortCode,    
         PhoneNumber : `254${phone}`,    
-        CallBackURL : "https://stockplusbackend.vercel.app/api/callback",    
-        AccountReference : "myaccount",    
-        TransactionDesc : "Test"
+        CallBackURL : process.env.callbackURL,    
+        AccountReference : "Stock Plus",    
+        TransactionDesc : "Stock Plus"
       },
       {
         headers: {
@@ -64,7 +64,12 @@ router.post("/stk", generateToken , async (req, res) => {
 
 router.post("/callback", (req, res) => {
   const callbackData = req.body;
+
+  // Log the callback data to the console
   console.log(callbackData);
+
+  // Send a response back to the M-Pesa
+  res.json({ status: 'success' });
 });
 
   
