@@ -23,42 +23,43 @@ const generateToken = async (req,res,next) => {
 
 // sending stk push
 router.post("/stk", generateToken , async (req, res) => {
-  try {
-    const phone = req.body.phone;
-    const amount = req.body.amount;
-    const timestamp = new Date().toISOString().replace(/\D/g,'').slice(0, 14);
-    const shortCode = process.env.MPESA_PAYBILL;
-    const passKey = process.env.MPESA_PASSKEY;
-    const password = Buffer.from(shortCode + passKey + timestamp).toString("base64");
+ 
+  const phone = req.body.phone;
+  const amount = req.body.amount;
+  const timestamp = new Date().toISOString().replace(/\D/g,'').slice(0, 14);
+  const shortCode = process.env.MPESA_PAYBILL;
+  const passKey = process.env.MPESA_PASSKEY;
+  const password = Buffer.from(shortCode + passKey + timestamp).toString("base64");
 
-    const response = await axios.post(
-      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-      {    
-        BusinessShortCode : shortCode,    
-        Password : password,    
-        Timestamp : timestamp,    
-        TransactionType: "CustomerPayBillOnline",
-        Amount : amount,    
-        PartyA : `254${phone}`,    
-        PartyB : shortCode,    
-        PhoneNumber : `254${phone}`,    
-        CallBackURL : process.env.callbackURL,    
-        AccountReference : "Stock Plus",    
-        TransactionDesc : "Stock Plus"
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization : `Bearer ${accessToken}`
-        }
+  await axios.post(
+    "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+    {    
+      BusinessShortCode : shortCode,    
+      Password : password,    
+      Timestamp : timestamp,    
+      TransactionType: "CustomerPayBillOnline",
+      Amount : amount,    
+      PartyA : `254${phone}`,    
+      PartyB : shortCode,    
+      PhoneNumber : `254${phone}`,    
+      CallBackURL : process.env.callbackURL,    
+      AccountReference : "Stock Plus",    
+      TransactionDesc : "Stock Plus"
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization : `Bearer ${accessToken}`
       }
-    );
-    console.log(response.data);
-    res.status(200).json(response.data);
-  } catch (error) {
-    console.log(error.response.data.errorMessage);
-    res.status(400).json({ message: error.message }); 
-  }
+    }
+  )
+  .then((data) => {
+    console.log(data.data)
+    res.status(200).json(data.data)
+  })
+  .catch((err) => {
+    console.log(err.message)
+  })
 });
 
 
