@@ -26,10 +26,12 @@ router.post("/stk", generateToken , async (req, res) => {
   try {
     const phone = req.body.phone;
     const amount = req.body.amount;
+    const orderId = req.body.orderId;
     const timestamp = new Date().toISOString().replace(/\D/g,'').slice(0, 14);
     const shortCode = process.env.MPESA_PAYBILL;
     const passKey = process.env.MPESA_PASSKEY;
     const password = Buffer.from(shortCode + passKey + timestamp).toString("base64");
+    const callbackURL = process.env.callbackURL
 
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
@@ -42,7 +44,7 @@ router.post("/stk", generateToken , async (req, res) => {
         PartyA : `254${phone}`,    
         PartyB : shortCode,    
         PhoneNumber : `254${phone}`,    
-        CallBackURL : process.env.callbackURL,    
+        CallBackURL : `${callbackURL}/${orderId}`,    
         AccountReference : "Stock Plus",    
         TransactionDesc : "Stock Plus"
       },
@@ -62,27 +64,45 @@ router.post("/stk", generateToken , async (req, res) => {
 });
 
 
-router.post("/callback", (req, res) => {
+router.post("/callback/:orderId",  async (req, res) => {
   const callbackData = req.body;
+  console.log(callbackData)
 
-  // Log the callback data to the console
-  console.log(callbackData);
+  try{
+    //order id
+    const orderId = req.params;
+    
+    //callback details
+    const {MerchantRequestID,CheckoutRequestID,ResultCode,ResultDesc,CallbackMetadata} = req.body.Body.stkCallback
 
-  if (!callbackData.Body.stkCallback.CallbackMetadata) {
-    console.log(callbackData.Body)
-    return res.status(200).json("OK")
-  }
+    // get the meta data from the meta
+    const meta = Object.values(await CallbackMetadata.Item)
+    const PhoneNumber = meta.find(o => o.Name === 'PhoneNumber').Value.toString()
+    const Amount = meta.find(o => o.Name === 'Amount').Value.toString()
+    const MpesaReceiptNumber = meta.find(o => o.Name === 'MpesaReceiptNumber').Value.toString()
+    const TransactionDate = meta.find(o => o.Name === 'TransactionDate').Value.toString()
 
-
-  console.log(callbackData.Body.stkCallback.CallbackMetadata)
-
-    const id = callbackData.Body.stkCallback.CallbackMetadata.Item[3].Value
-    const phone = callbackData.Body.stkCallback.CallbackMetadata.Item[4].Value
-    const amount = callbackData.Body.stkCallback.CallbackMetadata.Item[0].Value
-
-    console.log({id,phone,amount})
-
-  res.status(200)
+    // do something with the data
+    console.log("-".repeat(20)," OUTPUT IN THE CALLBACK ", "-".repeat(20))
+    console.log(`
+        Order_ID : ${orderId},
+        MerchantRequestID : ${MerchantRequestID},
+        CheckoutRequestID: ${CheckoutRequestID},
+        ResultCode: ${ResultCode},
+        ResultDesc: ${ResultDesc},
+        PhoneNumber : ${PhoneNumber},
+        Amount: ${Amount}, 
+        MpesaReceiptNumber: ${MpesaReceiptNumber},
+        TransactionDate : ${TransactionDate}
+    `)
+      res.json(true)
+    } catch (error) {
+        console.error("Error while trying to update LipaNaMpesa details from the callback",error)
+        res.status(503).send({
+            message:"Something went wrong with the callback",
+            error : error.message
+        })
+    }
 });
 
   
