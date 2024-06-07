@@ -62,7 +62,7 @@ router.post("/stk", generateToken , async (req, res) => {
 });
 
 
-router.post("/api/callback", (req, res) => {
+router.post("/callback", (req, res) => {
   const callbackData = req.body;
   console.log(
     "INFO",
