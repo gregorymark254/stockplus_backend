@@ -74,23 +74,14 @@ router.post("/callback", (req, res) => {
   }
 
 
-  if (callbackData.Body.stkCallback.CallbackMetadata) {
+  console.log(callbackData.Body.stkCallback.CallbackMetadata)
+    res.status(200)
+
     const id = callbackData.Body.stkCallback.CallbackMetadata.Item[3].Value
     const phone = callbackData.Body.stkCallback.CallbackMetadata.Item[4].Value
     const amount = callbackData.Body.stkCallback.CallbackMetadata.Item[0].Value
-    console.log(id,phone,amount)
 
-    // const insertPaymentsQuery = `INSERT INTO payments (amount,paymentMethod,orderId) values(?,?,?)`;
-    // connection.query(insertPaymentsQuery, [MpesaReceiptNumber, MerchantRequestID],(err, results) => {
-    //   if (err) {
-    //     console.log(err)
-    //     let response = `There was an error please try again later!`;
-    //     res.send(response);
-    //     return;
-    //   }
-    //   res.status(200).json('Payment added successful')
-    // });
-  }
+    console.log({id,phone,amount})
 
   res.status(200)
 });
