@@ -69,8 +69,7 @@ router.post("/callback", (req, res) => {
   // Log the callback data to the console
   console.log(callbackData);
 
-  // Send a response back to the M-Pesa
-  res.json({ status: 'success' });
+
 
   console.log(
     "INFO",
@@ -91,6 +90,8 @@ router.post("/callback", (req, res) => {
   console.log(MerchantRequestID)
   console.log(safaricomResponse)
 
+    // Send a response back to the M-Pesa
+    res.json({ status: 'success' });
 });
 
   
