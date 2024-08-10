@@ -94,6 +94,7 @@ router.post("/callback/:orderId", (req, res) => {
   //     MpesaReceiptNumber: ${MpesaReceiptNumber},
   //     TransactionDate : ${TransactionDate}
   //   `);
+  // https://wamaithanyamu.com/how-to-integrate-the-mpesa-stk-push-api-in-nodejs
 
   //   // Insert payment data into database
   //   const sql = `INSERT INTO payments (amount, paymentMethod, orderId) VALUES (?, ?, ?)`;

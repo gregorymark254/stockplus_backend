@@ -75,7 +75,7 @@ router.post("/orders", authUser, async (req,res) => {
             console.log(err);
             return res.status(500).json({error: 'Error creating order'})
         } 
-        res.status(200).json({ message: 'Order created successfully', orderId: orderId });
+        res.status(200).json({ message: 'Order created successfully' });
     })
 })
 
